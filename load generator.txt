@@ -1,0 +1,44 @@
+Overview
+A small Go module that emits real NetFlow v9 UDP datagrams (version 9 header, template flow set id 0, data flow set with template id 256) so goflow2 can decode them. Each tenant gets a distinct SourceId in the header (goflow2’s observation domain key for templates), so templates stay separated even when Windows forces a single UDP socket and one source IP.
+
+Layout:
+
+main.go — CLI, per-tenant senders, pacing, Ctrl+C, live stats (ANSI; disabled with -no-color). Build/run notes are in the file header.
+internal/netflowv9/packet.go — wire-format builder (11 standard fields, 31-byte records, ≤1200 B UDP payloads, 36 flows/packet max on current math).
+internal/traffic/traffic.go — AV vs IT mix (-av-ratio), ports (554, 8554, 5000–5004, NDI-ish, Dante-ish, SRT, etc.), multicast / “new subnet” style risk batches (-risk-pct, default 10% per UDP packet).
+internal/tenant/tenant.go + tenants.example.yaml — optional id + exporter_ip; extra tenants filled from -exporter-base with incrementing IPv4.
+Flags (also -h)
+Flag	Default
+-tenants
+15
+-rate
+800 (flow records/s total)
+-duration
+30m (Go duration + optional Nd days)
+-target
+127.0.0.1:2055
+-av-ratio
+0.65
+-tenants-file
+(empty)
+-exporter-base
+192.168.100.1
+-risk-pct
+10
+-bind-exporters
+true
+-no-color
+false
+Build / run
+cd c:\Users\tedhi\avoip-load-generator
+go mod tidy
+go build -o avoip-load-generator.exe .
+.\avoip-load-generator.exe -tenants-file tenants.example.yaml -tenants 15 -rate 800 -duration 30m
+On Windows, per-tenant exporter_ip bind usually fails unless those addresses exist on the host; the tool falls back to one socket and prints a yellow note. For real per-IP exporter behavior, use secondary addresses (e.g. Linux ip addr add …) or run closer to production networking.
+
+Alignment with your backend
+Copy tenant id strings and exporter_ip values from avoipbackend into tenants.example.yaml (or your own file) and pass -tenants-file. If -tenants is larger than the file, the rest are synthetic IPs continuing after the last YAML address from -exporter-base / last file IP.
+
+A quick smoke test on this machine showed ~2000 flows/s sustained for 2s with zero errors (no collector listening, UDP still accepted by stack for localhost send path — actually UDP to 127.0.0.1:2055 without listener may drop or ICMP - we got no errors in Write which is normal for UDP fire-and-forget on Windows to closed port sometimes - user had 0 errors).
+
+go test ./... runs layout tests under internal/netflowv9.

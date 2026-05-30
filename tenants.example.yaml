@@ -1,0 +1,14 @@
+# Optional tenant list for AVoIPCollector / backend alignment.
+# Use: avoip-load-generator -tenants-file tenants.example.yaml
+#
+# exporter_ip is used as the UDP source when the OS allows binding to it
+# (typical on Linux with secondary addresses). On Windows, binding often
+# fails unless those addresses exist locally; the tool falls back to a
+# single socket and still varies NetFlow SourceId per tenant.
+#
+# If the file lists fewer entries than -tenants, remaining tenants get
+# auto-generated IPs after the last configured address.
+
+tenants:
+  - id: c1a9f925-0751-4e9e-9180-fc77ad74bd9f
+    exporter_ip: 69.253.84.27
