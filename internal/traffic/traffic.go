@@ -16,7 +16,7 @@ type Profile struct {
 }
 
 var (
-	itPorts = []uint16{53, 80, 443, 22, 123, 389, 636, 445, 3389, 587, 993}
+	loadItPorts = []uint16{53, 80, 443, 22, 123, 389, 636, 445, 3389, 587, 993}
 	avPorts = []uint16{
 		554, 8554, 5000, 5001, 5002, 5003, 5004,
 		5956, 5960, 5961, 5962, 5968, 5970, 5980, 5990,
@@ -48,7 +48,7 @@ func FillRecord(rec []byte, p Profile, rng *rand.Rand, uptimeMS uint32) {
 		}
 	} else {
 		srcPort = uint16(rng.IntN(32768) + 32768)
-		dstPort = itPorts[rng.IntN(len(itPorts))]
+		dstPort = loadItPorts[rng.IntN(len(loadItPorts))]
 	}
 
 	if p.Risky {

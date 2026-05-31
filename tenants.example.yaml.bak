@@ -10,7 +10,5 @@
 # auto-generated IPs after the last configured address.
 
 tenants:
-  - id: aea800ed-2925-4e5f-ac1d-ecbf39544739
-    exporter_ip: 127.0.0.1
-  - id: b6d3cad8-1f52-4c14-85c5-c9c6582dd315
-    exporter_ip: 127.0.0.1
+  - id: b61cfc03-b6a7-4714-ab13-ad152feb99ce
+    exporter_ip: 69.253.84.27

@@ -131,3 +131,35 @@ func bumpExporterIP(ip net.IP) {
 func ParseIPv4(s string) net.IP {
 	return net.ParseIP(strings.TrimSpace(s)).To4()
 }
+
+// ResolveOne returns a single tenant for verification mode.
+func ResolveOne(id, file, exporterIP string) (Tenant, error) {
+	id = strings.TrimSpace(id)
+	if id == "" {
+		return Tenant{}, fmt.Errorf("-tenant-id is required in verification mode")
+	}
+	if file != "" {
+		list, err := LoadFile(file)
+		if err != nil {
+			return Tenant{}, err
+		}
+		for i, t := range list {
+			if t.ID == id {
+				return Tenant{
+					ID:         t.ID,
+					ExporterIP: cloneIP(t.ExporterIP),
+					SourceID:   sourceIDFor(i, id),
+				}, nil
+			}
+		}
+	}
+	ip := ParseIPv4(exporterIP)
+	if ip == nil {
+		return Tenant{}, fmt.Errorf("verification mode requires -exporter-ip or -tenants-file containing -tenant-id %q", id)
+	}
+	return Tenant{
+		ID:         id,
+		ExporterIP: ip,
+		SourceID:   sourceIDFor(0, id),
+	}, nil
+}

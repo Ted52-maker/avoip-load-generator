@@ -27,8 +27,8 @@ var fieldSpecs = [][2]uint16{
 	{6, 1},   // TCP_FLAGS
 	{7, 2},   // L4_SRC_PORT
 	{8, 4},   // IPV4_SRC_ADDR
-	{9, 4},   // IPV4_DST_ADDR
-	{12, 2},  // L4_DST_PORT
+	{12, 4},  // IPV4_DST_ADDR (RFC 3954 field 12)
+	{11, 2},  // L4_DST_PORT (RFC 3954 field 11)
 	{21, 4},  // LAST_SWITCHED (sys uptime ms at end of flow)
 	{22, 4},  // FIRST_SWITCHED
 }
